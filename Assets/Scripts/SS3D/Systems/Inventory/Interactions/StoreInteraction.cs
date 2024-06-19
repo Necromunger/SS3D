@@ -41,7 +41,12 @@ namespace SS3D.Systems.Inventory.Interactions
                 var hands = sourceGameObjectProvider.GameObject.GetComponentInParent<Hands>();
                 if (hands != null && _attachedContainer != null)
                 {
-                    return !hands.SelectedHand.IsEmpty() && CanStore(interactionEvent.Source.GetComponent<Item>(), _attachedContainer);
+                    // Check if source is an item
+                    var item = interactionEvent.Source.GetComponent<Item>();
+                    if (item != null)
+                    {
+                        return !hands.SelectedHand.IsEmpty() && CanStore(item, _attachedContainer);
+                    }
                 }
             }
 
