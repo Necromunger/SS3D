@@ -139,6 +139,8 @@ namespace SS3D.Systems.Audio
                 audioSources.CreateNewAudioSource();
             }
 
+            audioSources.List.RemoveAll(source => source == null);
+
             //Check the list for an audio source that isn't being used.
             foreach (AudioSource source in audioSources.List)
             {
@@ -170,7 +172,8 @@ namespace SS3D.Systems.Audio
         {
             _audioSourcesLists = new List<AudioSourcesList>
             {
-                new AudioSourcesList(MaxSfxAudioSources, MinSfxAudioSources, AudioType.Sfx, SfxAudioSourcePrefab, GameObject), new AudioSourcesList(MaxMusicAudioSources, MinMusicAudioSources, AudioType.Music, MusicAudioSourcePrefab, GameObject)
+                new AudioSourcesList(MaxSfxAudioSources, MinSfxAudioSources, AudioType.Sfx, SfxAudioSourcePrefab, GameObject), 
+                new AudioSourcesList(MaxMusicAudioSources, MinMusicAudioSources, AudioType.Music, MusicAudioSourcePrefab, GameObject)
             };
         }
 
