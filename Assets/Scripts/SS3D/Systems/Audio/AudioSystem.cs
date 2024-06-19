@@ -132,14 +132,13 @@ namespace SS3D.Systems.Audio
             AudioSource validSource = null;
 
             AudioSourcesList audioSources = _audioSourcesLists.Find(x => x.AudioType == audioType);
+            audioSources.List.RemoveAll(source => source == null);
 
             //If there are no audio sources in our list, fix that.
             if (audioSources.List.Count == 0)
             {
                 audioSources.CreateNewAudioSource();
             }
-
-            audioSources.List.RemoveAll(source => source == null);
 
             //Check the list for an audio source that isn't being used.
             foreach (AudioSource source in audioSources.List)
