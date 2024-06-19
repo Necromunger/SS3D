@@ -377,8 +377,11 @@ namespace SS3D.Systems.Inventory.Containers
 		/// <param name="newItem"> the item to store.</param>
 		private bool AddStoredItem(StoredItem newItem)
 		{
-            if (!CanContainItem(newItem.Item)) return false;
-            if (newItem.Item.Container != null && newItem.Item.Container != this) return false;
+            if (!CanContainItem(newItem.Item)) 
+                return false;
+
+            if (newItem.Item.Container != null && ReferenceEquals(newItem.Item.Container, this)) 
+                return false;
 
             if (FindItem(newItem.Item, out int itemIndex))
             {
