@@ -336,11 +336,10 @@ namespace SS3D.Systems.Inventory.Containers
 		public bool AddItem(Item item)
 		{
 			// TODO: Use a more efficient algorithm
-			for (int y = 0; y <= Size.y; y++)
+			for (int y = 0; y <= Size.y - 1; y++)
 			{
-				for (int x = 0; x <= Size.x; x++)
+				for (int x = 0; x <= Size.x - 1; x++)
 				{
-
 					Vector2Int itemPosition = new Vector2Int(x, y);
 					if (AddItemPosition(item, itemPosition))
 					{
@@ -378,15 +377,19 @@ namespace SS3D.Systems.Inventory.Containers
 		/// <param name="newItem"> the item to store.</param>
 		private bool AddStoredItem(StoredItem newItem)
 		{
+            // Fail if attempted storage position is out of bounds
+            if (newItem.Position.x >= Size.x || newItem.Position.y >= Size.y)
+                return false;
+
+            // Fail if item is at this postion
+            if (ItemAt(newItem.Position))
+                return false;
+
             if (!CanContainItem(newItem.Item))
                 return false;
 
             // Fail if its not a container or is the same container
             if (newItem.Item.Container != null && ReferenceEquals(newItem.Item.Container, this)) 
-                return false;
-
-            // Fail if item is at this postion
-            if (ItemAt(newItem.Position))
                 return false;
 
             if (FindItem(newItem.Item, out int itemIndex))

@@ -30,27 +30,21 @@ namespace SS3D.Systems.Inventory.Interactions
         public override bool CanInteract(InteractionEvent interactionEvent)
         {
             if (!InteractionExtensions.RangeCheck(interactionEvent))
-            {
                 return false;
-            }
 
             IInteractionSource source = interactionEvent.Source;
+            if (source is not IGameObjectProvider sourceGameObjectProvider)
+                return false;
 
-            if(source is IGameObjectProvider sourceGameObjectProvider)
-            {
-                var hands = sourceGameObjectProvider.GameObject.GetComponentInParent<Hands>();
-                if (hands != null && _attachedContainer != null)
-                {
-                    // Check if source is an item
-                    var item = interactionEvent.Source.GetComponent<Item>();
-                    if (item != null)
-                    {
-                        return !hands.SelectedHand.IsEmpty() && CanStore(item, _attachedContainer);
-                    }
-                }
-            }
+            Hands hands = sourceGameObjectProvider.GameObject.GetComponentInParent<Hands>();
+            if (!hands && !_attachedContainer)
+                return false;
 
-            return false;
+            Item item = interactionEvent.Source.GetComponent<Item>();
+            if (!item)
+                return false;
+            
+            return !hands.SelectedHand.IsEmpty() && CanStore(item, _attachedContainer);
         }
 
         private bool CanStore(Item item, AttachedContainer target)
@@ -63,8 +57,8 @@ namespace SS3D.Systems.Inventory.Interactions
             IInteractionSource source = interactionEvent.Source;
             if (source is IGameObjectProvider sourceGameObjectProvider)
             {
-                var hands = sourceGameObjectProvider.GameObject.GetComponentInParent<Hands>();
-                var item = hands.SelectedHand.ItemInHand;
+                Hands hands = sourceGameObjectProvider.GameObject.GetComponentInParent<Hands>();
+                Item item = hands.SelectedHand.ItemInHand;
 
                 hands.SelectedHand.Container.Dump();
                 _attachedContainer.AddItem(item);
