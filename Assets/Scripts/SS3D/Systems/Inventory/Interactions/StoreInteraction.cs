@@ -30,19 +30,27 @@ namespace SS3D.Systems.Inventory.Interactions
         public override bool CanInteract(InteractionEvent interactionEvent)
         {
             if (!InteractionExtensions.RangeCheck(interactionEvent))
+            {
                 return false;
+            }
 
             IInteractionSource source = interactionEvent.Source;
             if (source is not IGameObjectProvider sourceGameObjectProvider)
+            {
                 return false;
+            }
 
             Hands hands = sourceGameObjectProvider.GameObject.GetComponentInParent<Hands>();
             if (!hands && !_attachedContainer)
+            {
                 return false;
+            }
 
             Item item = interactionEvent.Source.GetComponent<Item>();
             if (!item)
+            {
                 return false;
+            }
             
             return !hands.SelectedHand.IsEmpty() && CanStore(item, _attachedContainer);
         }

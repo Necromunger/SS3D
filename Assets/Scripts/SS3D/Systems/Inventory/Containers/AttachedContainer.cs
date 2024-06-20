@@ -379,18 +379,26 @@ namespace SS3D.Systems.Inventory.Containers
 		{
             // Fail if attempted storage position is out of bounds
             if (newItem.Position.x >= Size.x || newItem.Position.y >= Size.y)
+            {
                 return false;
+            }
 
             // Fail if item is at this postion
             if (ItemAt(newItem.Position))
+            {
                 return false;
+            }
 
             if (!CanContainItem(newItem.Item))
+            {
                 return false;
+            }
 
             // Fail if its not a container or is the same container
-            if (newItem.Item.Container != null && ReferenceEquals(newItem.Item.Container, this)) 
+            if (newItem.Item.Container != null && ReferenceEquals(newItem.Item.Container, this))
+            {
                 return false;
+            }
 
             if (FindItem(newItem.Item, out int itemIndex))
             {
