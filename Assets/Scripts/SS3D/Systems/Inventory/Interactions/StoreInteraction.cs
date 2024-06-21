@@ -41,7 +41,7 @@ namespace SS3D.Systems.Inventory.Interactions
             }
 
             Hands hands = sourceGameObjectProvider.GameObject.GetComponentInParent<Hands>();
-            if (!hands && !_attachedContainer)
+            if (!hands || !_attachedContainer)
             {
                 return false;
             }

@@ -336,9 +336,9 @@ namespace SS3D.Systems.Inventory.Containers
 		public bool AddItem(Item item)
 		{
 			// TODO: Use a more efficient algorithm
-			for (int y = 0; y <= Size.y - 1; y++)
+			for (int y = 0; y < Size.y; y++)
 			{
-				for (int x = 0; x <= Size.x - 1; x++)
+				for (int x = 0; x < Size.x; x++)
 				{
 					Vector2Int itemPosition = new Vector2Int(x, y);
 					if (AddItemPosition(item, itemPosition))
@@ -382,6 +382,11 @@ namespace SS3D.Systems.Inventory.Containers
             {
                 return false;
             }
+            
+            if (newItem.Position.x < 0 || newItem.Position.y < 0)
+            {
+                return false;
+            }
 
             // Fail if item is at this postion
             if (ItemAt(newItem.Position))
@@ -394,8 +399,8 @@ namespace SS3D.Systems.Inventory.Containers
                 return false;
             }
 
-            // Fail if its not a container or is the same container
-            if (newItem.Item.Container != null && ReferenceEquals(newItem.Item.Container, this))
+            // Fail if it is the same container
+            if (ReferenceEquals(newItem.Item.Container, this))
             {
                 return false;
             }
