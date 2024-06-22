@@ -18,6 +18,7 @@ namespace SS3D.Systems.Entities
     [Serializable]
     public class Entity : NetworkActor
     {
+        public GameObject ViewPoint;
         public event Action<Mind> OnMindChanged;
 
         [SerializeField]

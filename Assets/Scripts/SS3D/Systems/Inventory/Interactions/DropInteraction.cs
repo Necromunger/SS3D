@@ -2,6 +2,7 @@
 using SS3D.Data.Generated;
 using SS3D.Interactions;
 using SS3D.Interactions.Extensions;
+using SS3D.Systems.Entities;
 using SS3D.Systems.Inventory.Containers;
 using UnityEngine;
 
@@ -30,6 +31,31 @@ namespace SS3D.Systems.Inventory.Interactions
         {
             // if the interaction source's parent is not a hand we return false
             if (interactionEvent.Source.GetRootSource() is not Hand)
+            {
+                return false;
+            }
+
+            // confirm that there is an entity doing this interaction
+            Entity entity = interactionEvent.Source.GetComponentInParent<Entity>();
+            if (!entity)
+            {
+                return false;
+            }
+
+            // confirm the entities ViewPoint can see the drop point
+            Vector3 direction = (interactionEvent.Point - entity.ViewPoint.transform.position).normalized;
+            bool raycast = Physics.Raycast(entity.ViewPoint.transform.position, direction, out RaycastHit hit);
+            if (!raycast)
+            {
+                return false;
+            }
+
+            //TODO: remove
+            Debug.DrawLine(entity.ViewPoint.transform.position, hit.point, Color.red, 10);
+
+            // check the angle of the surface hit
+            float angle = Vector3.Angle(hit.normal, Vector3.up);
+            if (angle > _maxSurfaceAngle)
             {
                 return false;
             }
