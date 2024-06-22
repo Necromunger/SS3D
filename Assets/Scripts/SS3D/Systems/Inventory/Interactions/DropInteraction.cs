@@ -17,6 +17,11 @@ namespace SS3D.Systems.Inventory.Interactions
         /// </summary>
         private float _maxSurfaceAngle = 10;
 
+        /// <summary>
+        /// Only raycast the default layer
+        /// </summary>
+        private LayerMask _defaultMask = LayerMask.GetMask("Default");
+
         public override string GetName(InteractionEvent interactionEvent)
         {
             return "Drop";
@@ -44,8 +49,14 @@ namespace SS3D.Systems.Inventory.Interactions
 
             // confirm the entities ViewPoint can see the drop point
             Vector3 direction = (interactionEvent.Point - entity.ViewPoint.transform.position).normalized;
-            bool raycast = Physics.Raycast(entity.ViewPoint.transform.position, direction, out RaycastHit hit);
+            bool raycast = Physics.Raycast(entity.ViewPoint.transform.position, direction, out RaycastHit hit, Mathf.Infinity, _defaultMask);
             if (!raycast)
+            {
+                return false;
+            }
+
+            // confirm tested hit point is near the interaction point
+            if (Vector3.Distance(interactionEvent.Point, hit.point) > 0.1)
             {
                 return false;
             }
@@ -73,11 +84,18 @@ namespace SS3D.Systems.Inventory.Interactions
                 return false;
             }
 
+            // confirm that there is an entity doing this interaction
+            Entity entity = interactionEvent.Source.GetComponentInParent<Entity>();
+            if (!entity)
+            {
+                return false;
+            }
+
             // we check if the source of the interaction is a hand
             if (interactionEvent.Source.GetRootSource() is Hand hand)
             {
                 // we rotate the item based on the facing direction of the hand
-                Quaternion rotation = Quaternion.Euler(0, hand.ItemInHand.transform.eulerAngles.y, 0);
+                Quaternion rotation = Quaternion.Euler(0, entity.transform.eulerAngles.y, 0);
 
                 // we place the item in the hand in the point we clicked
                 hand?.PlaceHeldItemOutOfHand(interactionEvent.Point, rotation);
