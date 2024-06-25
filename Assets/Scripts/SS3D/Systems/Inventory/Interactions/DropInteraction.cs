@@ -18,7 +18,7 @@ namespace SS3D.Systems.Inventory.Interactions
         private float _maxSurfaceAngle = 10;
 
         /// <summary>
-        /// Only raycast the default layer
+        /// Only raycast the default layer for seeing if we are vision blocked
         /// </summary>
         private LayerMask _defaultMask = LayerMask.GetMask("Default");
 
@@ -61,9 +61,6 @@ namespace SS3D.Systems.Inventory.Interactions
                 return false;
             }
 
-            //TODO: remove
-            Debug.DrawLine(entity.ViewPoint.transform.position, hit.point, Color.red, 10);
-
             // check the angle of the surface hit
             float angle = Vector3.Angle(hit.normal, Vector3.up);
             if (angle > _maxSurfaceAngle)
@@ -94,7 +91,7 @@ namespace SS3D.Systems.Inventory.Interactions
             // we check if the source of the interaction is a hand
             if (interactionEvent.Source.GetRootSource() is Hand hand)
             {
-                // we rotate the item based on the facing direction of the hand
+                // we rotate the item based on the facing direction of the entity
                 Quaternion rotation = Quaternion.Euler(0, entity.transform.eulerAngles.y, 0);
 
                 // we place the item in the hand in the point we clicked
