@@ -29,75 +29,63 @@ namespace SS3D.Systems.Inventory.Interactions
 
         public override Sprite GetIcon(InteractionEvent interactionEvent)
         {
-            return Icon != null ? Icon : InteractionIcons.Discard;
+            return Icon ? Icon : InteractionIcons.Discard;
         }
 
         public override bool CanInteract(InteractionEvent interactionEvent)
         {
-            // if the interaction source's parent is not a hand we return false
+            // If item is not in hand return false
             if (interactionEvent.Source.GetRootSource() is not Hand)
             {
                 return false;
             }
 
-            // confirm that there is an entity doing this interaction
             Entity entity = interactionEvent.Source.GetComponentInParent<Entity>();
             if (!entity)
             {
                 return false;
             }
 
-            // confirm the entities ViewPoint can see the drop point
+            // Confirm the entities ViewPoint can see the drop point
             Vector3 direction = (interactionEvent.Point - entity.ViewPoint.transform.position).normalized;
-            bool raycast = Physics.Raycast(entity.ViewPoint.transform.position, direction, out RaycastHit hit, Mathf.Infinity, _defaultMask);
+            bool raycast = Physics.Raycast(entity.ViewPoint.transform.position, direction, out RaycastHit hit, 
+                Mathf.Infinity, _defaultMask);
             if (!raycast)
             {
                 return false;
             }
 
-            // confirm tested hit point is near the interaction point
+            // Confirm raycasted hit point is near the interaction point.
+            // This is necessary because interaction rays are casted from the camera, not from view point
             if (Vector3.Distance(interactionEvent.Point, hit.point) > 0.1)
             {
                 return false;
             }
-
-            // check the angle of the surface hit
-            float angle = Vector3.Angle(hit.normal, Vector3.up);
+            
+            // Consider if the surface is facing up
+            float angle = Vector3.Angle(interactionEvent.Normal, Vector3.up);
             if (angle > _maxSurfaceAngle)
             {
                 return false;
             }
+            
+            if (interactionEvent.Source.GetRootSource() is not Hand)
+            {
+                return false;
+            }
 
-            // and we do a range check just in case
             return InteractionExtensions.RangeCheck(interactionEvent);
         }
 
         public override bool Start(InteractionEvent interactionEvent, InteractionReference reference)
         {
-            // we consider if the surface we are placing the item on is flat
-            float angle = Vector3.Angle(interactionEvent.Normal, Vector3.up);  
-            if (angle > _maxSurfaceAngle)
-            {
-                return false;
-            }
-
-            // confirm that there is an entity doing this interaction
+            // rotate the item based on the facing direction of the entity
             Entity entity = interactionEvent.Source.GetComponentInParent<Entity>();
-            if (!entity)
-            {
-                return false;
-            }
-
-            // we check if the source of the interaction is a hand
-            if (interactionEvent.Source.GetRootSource() is Hand hand)
-            {
-                // we rotate the item based on the facing direction of the entity
-                Quaternion rotation = Quaternion.Euler(0, entity.transform.eulerAngles.y, 0);
-
-                // we place the item in the hand in the point we clicked
-                hand?.PlaceHeldItemOutOfHand(interactionEvent.Point, rotation);
-            }
-
+            Quaternion rotation = Quaternion.Euler(0, entity.transform.eulerAngles.y, 0);
+            
+            Hand hand = interactionEvent.Source.GetRootSource() as Hand;
+            hand.PlaceHeldItemOutOfHand(interactionEvent.Point, rotation);
+            
             return false;
         }
     }
